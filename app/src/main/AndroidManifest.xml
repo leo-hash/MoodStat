@@ -22,13 +22,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="moodstat.daily_report.daily_report"
-            android:exported="false"
-            android:theme="@style/Theme.MoodStat"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name="moodstat.daily_report.DailyReport"
             android:exported="false"
+            android:theme="@style/Theme.MoodStat"
             android:windowSoftInputMode="adjustResize" />
     </application>
 
