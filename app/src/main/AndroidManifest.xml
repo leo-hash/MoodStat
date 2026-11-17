@@ -27,7 +27,7 @@
             android:theme="@style/Theme.MoodStat"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="moodstat.daily_report.dailyReport"
+            android:name="moodstat.daily_report.DailyReport"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

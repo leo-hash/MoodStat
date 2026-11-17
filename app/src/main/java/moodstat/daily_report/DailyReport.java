@@ -3,14 +3,11 @@ package moodstat.daily_report;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.moodstat.R;
 
-public class dailyReport extends AppCompatActivity {
+public class DailyReport extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +23,9 @@ public class dailyReport extends AppCompatActivity {
 //        });
 
         // mood Fragment initialisation
-        Integer minInputs = 3;
+        int minInputs = 3;
         InputFragment moodFragment = InputFragment.newInstance(
+                "Wie geht es dir heute?",
                 "Liste mindestens " + minInputs +  " Dinge auf, die heute schön waren.",
                 minInputs
         );
@@ -40,6 +38,7 @@ public class dailyReport extends AppCompatActivity {
 
         // succes Fragment initialisation
         InputFragment successFragment = InputFragment.newInstance(
+                "Wie erfolgreich warst du heute darin, deine Ziele umzusetzten?",
                 "Liste mindestens " + minInputs +  " Dinge auf, die du heute gut gemacht hast.",
                 minInputs
         );

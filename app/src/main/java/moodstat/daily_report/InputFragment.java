@@ -3,7 +3,9 @@ package moodstat.daily_report;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigationevent.NavigationEventInfo;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.moodstat.R;
+import com.google.android.material.slider.Slider;
 
 import java.util.ArrayList;
 
@@ -24,13 +27,16 @@ import java.util.ArrayList;
 public class InputFragment extends Fragment {
 
     // the fragment initialization parameters
-    private static final String ARG_TITLE = "title";
+    private static final String ARG_SLIDER_LABEL = "slider_label";
+    private static final String ARG_LIST_LABEL = "list_label";
     private static final String ARG_N_TEXT_FIELDS = "nTextFields";
 
     // parameter objects
-    private String mTitle;
+    private String mSliderLabel;
+    private String mListLabel;
     private Integer mNTextField;
     private ArrayList<EditText> inputFields = new ArrayList<>();
+    private Float sliderValue = null;
 
 
     public InputFragment() {
@@ -41,16 +47,18 @@ public class InputFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param title displayed title
+     * @param sliderLabel displayed text over the slider
+     * @param listLabel displayed text over the list
      * @param nTextFields number of text fields
      * @return A new instance of fragment InputFragment.
      */
-    public static InputFragment newInstance(String title, int nTextFields) {
+    public static InputFragment newInstance(String sliderLabel, String listLabel, int nTextFields) {
         InputFragment fragment = new InputFragment();
 
         // retrieve arguments
         Bundle args = new Bundle();
-        args.putString(ARG_TITLE, title);
+        args.putString(ARG_SLIDER_LABEL, sliderLabel);
+        args.putString(ARG_LIST_LABEL, listLabel);
         args.putInt(ARG_N_TEXT_FIELDS, nTextFields);
         fragment.setArguments(args);
 
@@ -61,7 +69,8 @@ public class InputFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mTitle = getArguments().getString(ARG_TITLE);
+            mSliderLabel = getArguments().getString(ARG_SLIDER_LABEL);
+            mListLabel = getArguments().getString(ARG_LIST_LABEL);
             mNTextField = getArguments().getInt(ARG_N_TEXT_FIELDS);
         }
     }
@@ -70,25 +79,16 @@ public class InputFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_input, container, false);
-        TextView titleView = view.findViewById(R.id.fragmentTitle);
-        LinearLayout inputContainer = view.findViewById(R.id.inputContainer);
+        View view = inflater.inflate(
+                R.layout.fragment_input,
+                container,
+                false
+        );
 
-        titleView.setText(mTitle);
+        setupLabels(view);
+        setupInputFields(view);
+        setupAddButton(view);
 
-        // create n text fields
-        for (int i = 0; i < mNTextField ; i++){
-            createNewTextField(i, inputContainer);
-        }
-
-        // create add button
-        Button addButton = view.findViewById(R.id.addButton);
-
-        addButton.setOnClickListener( v -> {
-            createNewTextField(mNTextField, inputContainer);
-            mNTextField++;
-
-        });
         return view;
     }
 
@@ -122,8 +122,46 @@ public class InputFragment extends Fragment {
         inputFields.add(newTextField);
     }
 
+    public void setupLabels(View view){
+        TextView sliderLabelView = view.findViewById(R.id.sliderLabel);
+        sliderLabelView.setText(mSliderLabel);
 
-    public ArrayList<String> getInputs() {
+        TextView listLabelView = view.findViewById(R.id.listLabel);
+        listLabelView.setText(mListLabel);
+    }
+
+    public void setupInputFields(View view){
+        LinearLayout inputContainer = view.findViewById(R.id.inputContainer);
+
+        for (int i = 0; i < mNTextField ; i++){
+            createNewTextField(i, inputContainer);
+        }
+    }
+
+    public void setupSlider(View view){
+        Slider slider = view.findViewById(R.id.slider);
+
+        slider.addOnChangeListener((sliderView, value, fromUser) -> {
+            if(fromUser){
+                sliderValue = slider.getValue();
+            }
+        });
+    }
+
+    public void setupAddButton(View view){
+        LinearLayout inputContainer = view.findViewById(R.id.inputContainer);
+        Button addButton = view.findViewById(R.id.addButton);
+
+        addButton.setOnClickListener( v -> {
+            createNewTextField(mNTextField, inputContainer);
+            mNTextField++;
+        });
+
+
+    }
+
+
+    public ArrayList<String> getTextInputs() {
         ArrayList<String> results = new ArrayList<>();
 
         for (EditText field : inputFields ) {
@@ -131,5 +169,9 @@ public class InputFragment extends Fragment {
         }
 
         return results;
+    }
+
+    public float getSliderInputs(){
+        return sliderValue;
     }
 }

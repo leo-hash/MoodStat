@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.moodstat.R;
 
-import moodstat.daily_report.dailyReport;
+import moodstat.daily_report.DailyReport;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         Button button = findViewById(R.id.btn_daily_report);
 
         button.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, dailyReport.class);
+            Intent intent = new Intent(MainActivity.this, DailyReport.class);
             startActivity(intent);
         });
     }
