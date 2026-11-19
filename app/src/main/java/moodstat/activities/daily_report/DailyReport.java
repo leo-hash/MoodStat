@@ -1,4 +1,4 @@
-package moodstat.daily_report;
+package moodstat.activities.daily_report;
 
 import android.os.Bundle;
 

@@ -1,4 +1,4 @@
-package moodstat;
+package moodstat.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.moodstat.R;
 
-import moodstat.daily_report.DailyReport;
+import moodstat.activities.daily_report.DailyReport;
 
 public class MainActivity extends AppCompatActivity {
 

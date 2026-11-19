@@ -1,11 +1,11 @@
-package moodstat.daily_report;
+package moodstat.activities.daily_report;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigationevent.NavigationEventInfo;
+import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +17,15 @@ import android.widget.TextView;
 import com.example.moodstat.R;
 import com.google.android.material.slider.Slider;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import moodstat.App;
+import moodstat.viewmodel.DailyReportViewModel;
+import moodstat.viewmodel.DailyReportViewModelFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +45,8 @@ public class InputFragment extends Fragment {
     private Integer mNTextField;
     private ArrayList<EditText> inputFields = new ArrayList<>();
     private Float sliderValue = null;
+
+    private DailyReportViewModel viewModel;
 
 
     public InputFragment() {
@@ -73,10 +83,16 @@ public class InputFragment extends Fragment {
             mListLabel = getArguments().getString(ARG_LIST_LABEL);
             mNTextField = getArguments().getInt(ARG_N_TEXT_FIELDS);
         }
+
+        // initialise viewModel
+        App app = (App) requireActivity().getApplication();
+        DailyReportViewModelFactory factory = new DailyReportViewModelFactory(app.getRepo());
+        viewModel = new ViewModelProvider(requireActivity(), factory).get(DailyReportViewModel.class);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(
@@ -88,10 +104,34 @@ public class InputFragment extends Fragment {
         setupLabels(view);
         setupInputFields(view);
         setupAddButton(view);
+        setupSlider(view);
 
         return view;
     }
 
+
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        LocalDate today = LocalDate.now();
+
+        Slider slider = view.findViewById(R.id.slider);
+
+        viewModel.getReportByDate(today).observe(
+                getViewLifecycleOwner(),
+                report ->{
+                    if (report == null) {
+                        // no current report found -> show standard values
+                        return;
+                    }
+
+                    // TODO: fill formular with loaded values
+
+                }
+        );
+    }
 
     /**
      *
