@@ -1,7 +1,10 @@
 package moodstat.database.relations;
 
+import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 import androidx.room.Relation;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import moodstat.database.entities.DailyReportEntity;
@@ -21,11 +24,34 @@ public class DailyReportWithText {
             parentColumn = "id",
             entityColumn = "dailyReportId"
     )
-    public List<MoodTextEntity> moodTexts;
+    public List<MoodTextEntity> moodTexts = new ArrayList<>();
 
     @Relation(
             parentColumn = "id",
             entityColumn = "dailyReportId"
     )
-    public List<ProductivityTextEntity> productivityTexts;
+    public List<ProductivityTextEntity> productivityTexts = new ArrayList<>();
+
+
+
+    @NonNull
+    @Override
+    public String toString(){
+        String string = "DailyReportWithText: {dailyReport: " + dailyReport + ", ";
+
+        string += "moodTexts: [";
+        for (MoodTextEntity text : moodTexts){
+            string += text.toString() + ", ";
+        }
+        string += "], ";
+
+        string += "productivityTexts: [";
+        for (ProductivityTextEntity text : productivityTexts){
+            string += text.toString() + ", ";
+        }
+        string += "], ";
+
+        string += "}";
+        return string;
+    }
 }

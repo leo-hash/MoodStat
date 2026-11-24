@@ -1,15 +1,12 @@
 package moodstat.viewmodel;
 
-import androidx.lifecycle.LiveData;
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import moodstat.database.entities.DailyReportEntity;
-import moodstat.database.entities.MoodTextEntity;
-import moodstat.database.entities.ProductivityTextEntity;
 import moodstat.database.relations.DailyReportWithText;
 import moodstat.repositories.DailyReportRepository;
 
@@ -20,36 +17,88 @@ import moodstat.repositories.DailyReportRepository;
  * Instead of a normal Observable it's aware of the Life Cycle of app components.
  */
 public class DailyReportViewModel extends ViewModel {
+    private static final String TAG = "ViewModel";
     private final DailyReportRepository repo;
     private final MutableLiveData<Long> savedReportId = new MutableLiveData<>();
 
+    private LocalDate currentDate;
+
+    private DailyReportModel data = new DailyReportModel();
+    private DailyReportWithText report;
+
+
     public DailyReportViewModel(DailyReportRepository repo){
         this.repo = repo;
+        this.currentDate = LocalDate.now();
+        loadReport();
     }
 
-    public LiveData<DailyReportWithText> getReport(long id){
-        return repo.getReport(id);
+    public void loadReport(){
+        Log.d(TAG, "Try to load report");
+        repo.getReport(currentDate, reportData ->{
+            report = reportData;
+            if (report != null) {
+                data.setDataFromReport(report);
+            } else {
+//                TODO: should be maybe in DailyReportData.updateReportWithData()
+                report = new DailyReportWithText();
+                Log.d(TAG, "Report Empty, created new one");
+            }
+            Log.d(TAG, "Report: " + report);
+        });
+        Log.d(TAG, "Loading Successful");
     }
 
-    public LiveData<DailyReportWithText> getReportByDate(LocalDate date) {
-        return repo.getReportByDate(date);
+    public void loadReport(LocalDate date){
+        repo.getReport(date, reportData ->{
+            report = reportData;
+//            if (report != null) {
+                data.setDataFromReport(report);
+//            } else {
+                // TODO: handle null pointer, just creating a new object could send the wrong message
+                // maybe just let the exception happen, till better solution is found
+//                report = new DailyReportWithText();
+//            }
+        });
     }
 
-    public LiveData<Long> getSavedReportId(){
-        return savedReportId;
+    public void loadReport(long id){
+        repo.getReport(id, reportData ->{
+            report = reportData;
+            data.setDataFromReport(report);
+        });
     }
 
-    public void saveReport(
-            DailyReportEntity report,
-            List<MoodTextEntity> moodTexts,
-            List<ProductivityTextEntity> productivityTexts){
+    public  void saveReport(){
+        Log.d(TAG, "Try to save report");
+        Log.d(TAG, "DailyReportData (Frontend data): " + data);
+
+        data.updateReportWithData(report);
+
         repo.saveReport(
-                report,
-                moodTexts,
-                productivityTexts,
+                report.dailyReport,
+                report.moodTexts,
+                report.productivityTexts,
                 id -> savedReportId.postValue(id)
         );
+        Log.d(TAG, "Saving Successful. Report: " + report);
+
     }
 
 
+    //    ----- GETTER -----
+
+    public LocalDate getCurrentDate() {
+        return currentDate;
+    }
+
+    public DailyReportModel getData(){
+        return data;
+    }
+
+    //    ----- SETTER -----
+
+    public void setCurrentDate(LocalDate currentDate) {
+        this.currentDate = currentDate;
+    }
 }
