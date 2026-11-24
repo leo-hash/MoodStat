@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
 public class DailyReportEntity {
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
     public float moodValue;
     public float productivityValue;
     public LocalDate date;

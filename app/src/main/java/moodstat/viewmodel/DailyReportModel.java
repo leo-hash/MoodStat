@@ -1,5 +1,7 @@
 package moodstat.viewmodel;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
@@ -18,6 +20,7 @@ import moodstat.database.relations.DailyReportWithText;
  * -> frontend data representation
  */
 public class DailyReportModel {
+    private static final String TAG = "DailyReportModel";
     private MutableLiveData<Float> moodValue = new MutableLiveData<>(50.0F);
     private MutableLiveData<Float> productionValue = new MutableLiveData<>(50.0F);;
 
@@ -27,20 +30,28 @@ public class DailyReportModel {
 
 
     public void setDataFromReport(DailyReportWithText report){
+        if (report.dailyReport == null) {
+            Log.i(TAG, "Couldn't load Data from Report because: report.dailyReport == null");
+            return;
+        }
         moodValue = new MutableLiveData<>(report.dailyReport.moodValue);
         productionValue = new MutableLiveData<>(report.dailyReport.productivityValue);
 
-        List<String> moodTextList = Collections.emptyList();
-        for (MoodTextEntity text : report.moodTexts){
-            moodTextList.add(text.toString());
+        if(report.moodTexts != null) {
+            List<String> moodTextList = Collections.emptyList();
+            for (MoodTextEntity text : report.moodTexts) {
+                moodTextList.add(text.toString());
+            }
+            productivityTexts = new MutableLiveData<>(moodTextList);
         }
-        productivityTexts = new MutableLiveData<>(moodTextList);
 
-        List<String> prodTextList = Collections.emptyList();
-        for (ProductivityTextEntity text : report.productivityTexts){
-            prodTextList.add(text.toString());
+        if(report.productivityTexts != null) {
+            List<String> prodTextList = Collections.emptyList();
+            for (ProductivityTextEntity text : report.productivityTexts) {
+                prodTextList.add(text.toString());
+            }
+            productivityTexts = new MutableLiveData<>(prodTextList);
         }
-        productivityTexts = new MutableLiveData<>(prodTextList);
     }
 
     public void updateReportWithData(DailyReportWithText report){

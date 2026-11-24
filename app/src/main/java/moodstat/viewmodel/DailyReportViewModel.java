@@ -37,8 +37,10 @@ public class DailyReportViewModel extends ViewModel {
         Log.d(TAG, "Try to load report");
         repo.getReport(currentDate, reportData ->{
             report = reportData;
+
             if (report != null) {
                 data.setDataFromReport(report);
+
             } else {
 //                TODO: should be maybe in DailyReportData.updateReportWithData()
                 report = new DailyReportWithText();
@@ -79,7 +81,10 @@ public class DailyReportViewModel extends ViewModel {
                 report.dailyReport,
                 report.moodTexts,
                 report.productivityTexts,
-                id -> savedReportId.postValue(id)
+                id -> {
+                    savedReportId.postValue(id);
+                    report.dailyReport.id = id;
+                }
         );
         Log.d(TAG, "Saving Successful. Report: " + report);
 

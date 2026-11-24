@@ -1,5 +1,7 @@
 package moodstat.repositories;
 
+import android.util.Log;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +31,8 @@ import moodstat.database.relations.DailyReportWithText;
  * via executer (in an own thread)
  */
 public class DailyReportRepository {
+    private static final String TAG = "Repository";
+
     private final AppDatabase database;
 
     private final DailyReportDAO dailyReportDAO;
@@ -52,11 +56,24 @@ public class DailyReportRepository {
                            List<ProductivityTextEntity> productivityTexts,
                            Consumer<Long> callback){
         executor.execute(() -> {
-            long id = updateReportWithTexts(
-                    report,
-                    moodTexts,
-                    productivityTexts
-            );
+            long id;
+
+            if (report.id == 0) {
+                id = insertReportWithTexts(
+                        report,
+                        moodTexts,
+                        productivityTexts
+                );
+                Log.d(TAG, "New Report saved with ID: " + id);
+
+            } else {
+                id = updateReportWithTexts(
+                        report,
+                        moodTexts,
+                        productivityTexts
+                );
+                Log.d(TAG, "Report updated with ID: " + id);
+            }
 
             callback.accept(id);
         });
@@ -85,8 +102,20 @@ public class DailyReportRepository {
             DailyReportEntity report = query.get();
             DailyReportWithText reportWithText = new DailyReportWithText();
 
-            reportWithText.moodTexts = moodTextDAO.getEntryByReportId(report.id);
-            reportWithText.productivityTexts = productivityTextDAO.getEntryByReportId(report.id);
+            if ( report == null ){
+                return null;
+            }
+            reportWithText.dailyReport = report;
+
+            List<MoodTextEntity> loadedMoodTexts = moodTextDAO.getEntryByReportId(report.id);
+            if (loadedMoodTexts != null){
+                reportWithText.moodTexts = moodTextDAO.getEntryByReportId(report.id);
+            }
+
+            List<ProductivityTextEntity> loadedProdText = productivityTextDAO.getEntryByReportId(report.id);
+            if (loadedProdText != null){
+                reportWithText.productivityTexts = loadedProdText;
+            }
 
             return reportWithText;
         });
