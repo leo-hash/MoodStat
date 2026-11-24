@@ -1,5 +1,6 @@
 package moodstat.database.entities;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
@@ -25,5 +26,16 @@ public class DailyReportEntity {
         this.moodValue = moodValue;
         this.productivityValue = productivityValue;
         this.date = date;
+    }
+
+    @NonNull
+    @Override
+    public String toString(){
+        return "DailyReportEntity: {" +
+                "id: " + id + ", " +
+                "moodValue: " + moodValue + ", " +
+                "productivityValue: " + productivityValue + ", " +
+                "date: " + date +
+                "}";
     }
 }

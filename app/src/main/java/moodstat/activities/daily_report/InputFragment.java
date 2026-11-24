@@ -4,8 +4,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +87,7 @@ public class InputFragment extends Fragment {
         }
 
         // initialise viewModel
+        // TODO: maybe as parameter from activity, otherwise difficult to use saveBtn
         App app = (App) requireActivity().getApplication();
         DailyReportViewModelFactory factory = new DailyReportViewModelFactory(app.getRepo());
         viewModel = new ViewModelProvider(requireActivity(), factory).get(DailyReportViewModel.class);
@@ -116,21 +119,16 @@ public class InputFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         LocalDate today = LocalDate.now();
-
         Slider slider = view.findViewById(R.id.slider);
 
-        viewModel.getReportByDate(today).observe(
-                getViewLifecycleOwner(),
-                report ->{
-                    if (report == null) {
-                        // no current report found -> show standard values
-                        return;
-                    }
+        slider.setValue(viewModel.getData().getMoodValue().getValue());
 
-                    // TODO: fill formular with loaded values
+    }
 
-                }
-        );
+    @Override
+    public void onPause(){
+        super.onPause();
+        viewModel.saveReport();
     }
 
     /**
@@ -183,7 +181,7 @@ public class InputFragment extends Fragment {
 
         slider.addOnChangeListener((sliderView, value, fromUser) -> {
             if(fromUser){
-                sliderValue = slider.getValue();
+                viewModel.getData().setMoodValue(new MutableLiveData<>(slider.getValue()));
             }
         });
     }
@@ -196,10 +194,7 @@ public class InputFragment extends Fragment {
             createNewTextField(mNTextField, inputContainer);
             mNTextField++;
         });
-
-
     }
-
 
     public ArrayList<String> getTextInputs() {
         ArrayList<String> results = new ArrayList<>();

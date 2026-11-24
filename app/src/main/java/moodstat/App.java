@@ -18,7 +18,7 @@ public class App extends Application {
         super.onCreate();
 
         AppDatabase db = AppDatabase.getInstance(this);
-        repo = new DailyReportRepository(db.DailyReportDAO());
+        repo = new DailyReportRepository(db);
     }
 
     public DailyReportRepository getRepo() {
